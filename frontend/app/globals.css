@@ -139,7 +139,7 @@ button.pill, .guide-trigger {
   border-radius: 6px;
 }
 
-.field select { min-width: 220px; }
+.field select { min-width: 280px; }
 
 .primary, .ghost {
   padding: 0.6rem 1rem;

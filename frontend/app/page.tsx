@@ -121,6 +121,7 @@ export default function Page() {
             {symbols.map((item) => (
               <option key={item.symbol} value={item.symbol}>
                 {item.symbol} {item.name ? `— ${item.name}` : ""}
+                {item.sector ? `（${item.sector}）` : ""}
               </option>
             ))}
           </select>

@@ -1,5 +1,5 @@
 from app.services.adapters import parse_stooq_csv, parse_yahoo_chart, to_stooq_symbol, to_yahoo_symbol
-from app.services.market_data import load_bars
+from app.services.market_data import CATALOG, load_bars
 
 
 def test_stooq_symbol_mapping():
@@ -53,6 +53,15 @@ def test_load_bars_uses_sample_under_pytest():
     df, source = load_bars("7203.T", "stock", bars=120, seed=1)
     assert len(df) == 120
     assert source.startswith("sample:")
+
+
+def test_catalog_covers_major_names():
+    stocks = {item["symbol"] for item in CATALOG["stock"]}
+    fx = {item["symbol"] for item in CATALOG["fx"]}
+    assert len(stocks) >= 40
+    assert {"7203.T", "6758.T", "8035.T", "8316.T", "1321.T"} <= stocks
+    assert {"USDJPY", "EURJPY", "AUDUSD"} <= fx
+    assert all(item.get("sector") for item in CATALOG["stock"])
 
 
 def test_unknown_symbol():

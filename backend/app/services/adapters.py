@@ -18,8 +18,21 @@ HEURISTIC_ROOT = Path(os.getenv("HEURISTIC_ROOT", r"C:\devlop\heuristic-optimize
 STOCKAI_URL = os.getenv("STOCKAI_URL", "").rstrip("/")
 FX_URL = os.getenv("FX_URL", "").rstrip("/")
 
-STOOQ_FX = {"USDJPY": "usdjpy", "EURUSD": "eurusd", "GBPUSD": "gbpusd"}
-YAHOO_FX = {"USDJPY": "USDJPY=X", "EURUSD": "EURUSD=X", "GBPUSD": "GBPUSD=X"}
+STOOQ_FX = {
+    "USDJPY": "usdjpy",
+    "EURJPY": "eurjpy",
+    "GBPJPY": "gbpjpy",
+    "AUDJPY": "audjpy",
+    "NZDJPY": "nzdjpy",
+    "CADJPY": "cadjpy",
+    "CHFJPY": "chfjpy",
+    "EURUSD": "eurusd",
+    "GBPUSD": "gbpusd",
+    "AUDUSD": "audusd",
+    "USDCHF": "usdchf",
+    "USDCAD": "usdcad",
+}
+YAHOO_FX = {key: f"{key}=X" for key in STOOQ_FX}
 YAHOO_UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"

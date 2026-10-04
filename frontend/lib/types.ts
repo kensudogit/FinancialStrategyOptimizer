@@ -57,7 +57,7 @@ export interface PipelineOut {
 }
 
 export interface Catalog {
-  assets: Record<AssetClass, { symbol: string; name: string; source: string }[]>;
+  assets: Record<AssetClass, { symbol: string; name: string; source: string; sector?: string }[]>;
   strategies: { id: string; label: string; origin: string }[];
   integrations: { id: string; name: string; path: string; available: boolean; role: string }[];
 }
