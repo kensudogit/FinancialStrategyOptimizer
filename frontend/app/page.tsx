@@ -15,7 +15,8 @@ export default function Page() {
   const [symbol, setSymbol] = useState("7203.T");
   const [strategies, setStrategies] = useState<string[]>(DEFAULT_STRATEGIES);
   const [seed, setSeed] = useState(1);
-  const [maxTrials, setMaxTrials] = useState(16);
+  const [maxTrials, setMaxTrials] = useState(48);
+  const [bars, setBars] = useState(520);
   const [feeBps, setFeeBps] = useState(5);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -52,9 +53,10 @@ export default function Page() {
         strategies,
         seed,
         max_trials: maxTrials,
+        bars,
         fee_bps: feeBps,
         method: "grid",
-        time_limit_ms: 8000,
+        time_limit_ms: 20000,
         include_walk_forward: true,
         include_report: true,
       });
@@ -126,6 +128,10 @@ export default function Page() {
         <label className="field">
           seed
           <input type="number" value={seed} onChange={(e) => setSeed(Number(e.target.value) || 1)} />
+        </label>
+        <label className="field">
+          本数
+          <input type="number" value={bars} onChange={(e) => setBars(Number(e.target.value) || 80)} />
         </label>
         <label className="field">
           試行数

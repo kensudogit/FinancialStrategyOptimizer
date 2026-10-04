@@ -31,7 +31,7 @@ const BASIC_STEPS: Step[] = [
     no: "02",
     title: "資産クラスと銘柄を選ぶ",
     body: "上段の「資産」で株または FX を選び、「銘柄」を切り替えます。株は StockPricePredictionTool 側の銘柄（7203.T トヨタ、6758.T ソニー、9984.T ソフトバンクグループ）、FX は fx 側の通貨ペア（USDJPY など）です。候補は起動時の GET /catalog から入ります。この画面が統合入口で、既存パッケージは捨てません。",
-    note: "未知の銘柄を API に直接送ると 400 です。いまの系列は決定的なサンプル OHLCV です。実市場の確定値ではありません。実データへ差し替えるときは adapters 経由で StockAI / fx を見ます。パスが無いときはローカル実装で代替し、画面下の「統合している既存資産」に「パス未検出」と出ます。",
+    note: "未知の銘柄を API に直接送ると 400 です。取れるときは Yahoo 日足、StockAI HTTP、Stooq の順で入れます。取れないときだけ決定的サンプルです。データ源が sample: で始まる行は実市場の確定値ではありません。",
   },
   {
     no: "03",
@@ -42,7 +42,7 @@ const BASIC_STEPS: Step[] = [
   {
     no: "04",
     title: "seed・試行数・手数料を決める",
-    body: "seed を固定すると同じ乱数系列で探索を再現できます。試行数はパラメータ探索の上限（画面の既定 16）。手数料 bps は往復コストです（既定 5）。画面の一気通貫は method=grid、制限時間 8000ms、ウォークフォワードとレポート込みです。",
+    body: "seed を固定すると同じ乱数系列で探索を再現できます。本数の既定は 520（約2年）。試行数はパラメータ探索の上限（既定 48）。手数料 bps は往復コストです（既定 5）。画面の一気通貫は method=grid、制限時間 20000ms、ウォークフォワードとレポート込みです。",
     note: "試行数か制限時間のどちらかに達すると打ち切ります。打ち切った解は候補です。格子を走査し切ったときだけ「探索空間内の最良」と書きます。最適とは呼びません。",
   },
   {
@@ -83,7 +83,7 @@ const ADVANCED_STEPS: Step[] = [
 const TIPS: { title: string; body: string }[] = [
   {
     title: "「探索空間内の最良」と「候補」を混同しない",
-    body: "格子を走査し切ったとき（exhausted=true）だけ「探索空間内の最良」です。試行数や 8000ms で止まった結果は候補です。先頭の Sharpe が高くても最適とは呼びません。顧客説明でも同じ言い方にしてください。",
+    body: "格子を走査し切ったとき（exhausted=true）だけ「探索空間内の最良」です。試行数や 20000ms で止まった結果は候補です。先頭の Sharpe が高くても最適とは呼びません。顧客説明でも同じ言い方にしてください。",
   },
   {
     title: "API に接続できない・ポートが埋まっている",
@@ -171,8 +171,9 @@ export function GuideModal({ onClose }: { onClose: () => void }) {
             <ul className="guide-list">
               <li>Next.js — 銘柄・戦略・seed、一気通貫、資産曲線、レーダー、KPI、レポート保存</li>
               <li>FastAPI — /health /catalog /sample /backtest /optimize /compare /pipeline /report</li>
-              <li>pandas 単一エンジン — KPI スキーマを戦略間で揃える</li>
+              <li>pandas 単一エンジン — KPI スキーマを戦略間で揃える。曲線は探索後パラメータ</li>
               <li>grid / random / sa — seed・試行数・制限時間。未証明を最適と呼ばない</li>
+              <li>Yahoo / StockAI HTTP / Stooq — 取れた日足を使う。失敗時だけサンプル</li>
               <li>PostgreSQL 16 — ホスト 5434。無いときは永続化だけスキップ</li>
             </ul>
           </section>

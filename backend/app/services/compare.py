@@ -18,14 +18,21 @@ def compare_strategies(
     seed: int = 1,
     optimize: bool = True,
     method: str = "grid",
-    max_trials: int = 16,
-    time_limit_ms: int = 8000,
+    max_trials: int = 48,
+    time_limit_ms: int = 20000,
     include_walk_forward: bool = True,
+    precomputed: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     ranking = []
     series = []
     for name in strategies:
-        if optimize:
+        reuse = (precomputed or {}).get(name)
+        if reuse:
+            bt = reuse["best_backtest"]
+            params = reuse["best"]["params"]
+            note = reuse["note"]
+            optimized = True
+        elif optimize:
             opt = search_params(
                 df,
                 name,

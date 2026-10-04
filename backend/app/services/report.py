@@ -34,7 +34,7 @@ def render_report(symbol: str, asset_class: str, source: str, comparison: dict[s
         "## 注意",
         "",
         "- 証明していない解を最適とは呼びません。",
-        "- Unique な成績はサンプル経路に依存します。実データ差し替え後に再計算してください。",
+        "- データ源が sample: で始まるときは決定的な疑似系列です。yahoo / stooq / stockai-http のときだけ市場系列です。",
         "- StockPricePredictionTool と fx の既存エンジンは捨てていません。本パッケージは統合層です。",
         "",
     ]

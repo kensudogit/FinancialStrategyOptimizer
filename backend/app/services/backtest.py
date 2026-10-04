@@ -31,7 +31,7 @@ def run_backtest(
     equity = (1 + strat_rets).cumprod()
     buy_hold = (1 + rets).cumprod()
     drawdown = equity / equity.cummax() - 1
-    step = max(1, len(equity) // 80)
+    step = max(1, len(equity) // 160)
     curve = []
     for i in range(0, len(equity), step):
         ts = str(df.iloc[i]["ts"]) if "ts" in df.columns else str(i)

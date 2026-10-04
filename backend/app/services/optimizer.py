@@ -44,8 +44,8 @@ def search_params(
     strategy: str,
     *,
     method: str = "grid",
-    max_trials: int = 24,
-    time_limit_ms: int = 8000,
+    max_trials: int = 48,
+    time_limit_ms: int = 20000,
     seed: int = 1,
     fee_bps: float = 5.0,
 ) -> dict[str, Any]:

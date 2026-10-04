@@ -14,11 +14,18 @@ def run_walk_forward(
     strategy: str,
     params: dict | None = None,
     fee_bps: float = 5.0,
-    train_bars: int = 80,
-    test_bars: int = 30,
-    step_bars: int = 30,
+    train_bars: int | None = None,
+    test_bars: int | None = None,
+    step_bars: int | None = None,
 ) -> dict[str, Any]:
-    if len(df) < train_bars + test_bars + 10:
+    n = len(df)
+    if train_bars is None:
+        train_bars = 120 if n >= 400 else 80
+    if test_bars is None:
+        test_bars = 40 if n >= 400 else 30
+    if step_bars is None:
+        step_bars = test_bars
+    if n < train_bars + test_bars + 10:
         return {"status": "error", "message": "ウォークフォワードにはデータが足りません"}
 
     windows = []

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.services.backtest import public_backtest, run_backtest
 from app.services.compare import compare_strategies
 from app.services.market_data import load_bars
 from app.services.optimizer import search_params
@@ -15,17 +14,16 @@ def run_pipeline(
     symbol: str,
     strategies: list[str],
     fee_bps: float = 5.0,
-    bars: int = 260,
+    bars: int = 520,
     seed: int = 1,
     method: str = "grid",
-    max_trials: int = 16,
-    time_limit_ms: int = 8000,
+    max_trials: int = 48,
+    time_limit_ms: int = 20000,
     include_walk_forward: bool = True,
     include_report: bool = True,
 ) -> dict[str, Any]:
     df, source = load_bars(symbol, asset_class, bars=bars, seed=seed)
     names = strategies or ["sma_crossover", "rsi_mean_reversion", "macd_cross"]
-    backtests = [public_backtest(run_backtest(df, name, None, fee_bps, source)) for name in names]
     optimizations = [
         search_params(
             df,
@@ -38,6 +36,10 @@ def run_pipeline(
         )
         for name in names
     ]
+    backtests = []
+    for item in optimizations:
+        item["best_backtest"]["source"] = source
+        backtests.append(item["best_backtest"])
     comparison = compare_strategies(
         df,
         names,
@@ -48,6 +50,7 @@ def run_pipeline(
         max_trials=max_trials,
         time_limit_ms=time_limit_ms,
         include_walk_forward=include_walk_forward,
+        precomputed={item["strategy"]: item for item in optimizations},
     )
     comparison = {"symbol": symbol, "asset_class": asset_class, **comparison}
     markdown, html = ("", "")

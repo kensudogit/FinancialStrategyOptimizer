@@ -75,11 +75,11 @@ def sample() -> dict:
         "symbol": "7203.T",
         "strategies": ["sma_crossover", "rsi_mean_reversion", "macd_cross"],
         "fee_bps": 5,
-        "bars": 260,
+        "bars": 520,
         "seed": 1,
         "method": "grid",
-        "max_trials": 16,
-        "time_limit_ms": 8000,
+        "max_trials": 48,
+        "time_limit_ms": 20000,
     }
 
 

@@ -23,6 +23,10 @@ services:
       FRONTEND_ORIGINS: http://localhost:3000,http://localhost:3020,http://127.0.0.1:3020
       STOCKAI_ROOT: /opt/stockai
       FX_ROOT: /opt/fx
+      STOCKAI_URL: ${STOCKAI_URL:-http://host.docker.internal:8000}
+      FSO_ALLOW_LIVE_DATA: ${FSO_ALLOW_LIVE_DATA:-1}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy

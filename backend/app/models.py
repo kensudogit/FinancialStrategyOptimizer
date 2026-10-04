@@ -14,14 +14,14 @@ class BacktestRequest(BaseModel):
     strategy: str = "sma_crossover"
     params: dict[str, Any] = Field(default_factory=dict)
     fee_bps: float = Field(5, ge=0, le=100)
-    bars: int = Field(260, ge=80, le=2000)
+    bars: int = Field(520, ge=80, le=2000)
     seed: int = 1
 
 
 class OptimizeRequest(BacktestRequest):
     method: SearchMethod = "grid"
-    max_trials: int = Field(24, ge=4, le=200)
-    time_limit_ms: int = Field(8000, ge=500, le=120000)
+    max_trials: int = Field(48, ge=4, le=200)
+    time_limit_ms: int = Field(20000, ge=500, le=120000)
 
 
 class CompareRequest(BaseModel):
@@ -29,11 +29,11 @@ class CompareRequest(BaseModel):
     symbol: str = "7203.T"
     strategies: list[str] = Field(default_factory=lambda: ["sma_crossover", "rsi_mean_reversion", "macd_cross"])
     fee_bps: float = 5
-    bars: int = 260
+    bars: int = 520
     seed: int = 1
     method: SearchMethod = "grid"
-    max_trials: int = 16
-    time_limit_ms: int = 8000
+    max_trials: int = 48
+    time_limit_ms: int = 20000
     optimize: bool = True
 
 
