@@ -10,6 +10,13 @@
 - コミットと push は利用者から頼まれたときだけ行う
 - UI を変えたら http://localhost:3020 で操作確認する
 
+## 作業の進め方
+
+1. [`skill/financial-strategy-optimizer/SKILL.md`](skill/financial-strategy-optimizer/SKILL.md) を読んでから実装する
+2. 依頼を [`docs/作業内容.md`](docs/作業内容.md) の行に対応付ける
+3. サンプルは pytest で確認する
+4. UI を変えたら http://localhost:3020 で操作確認する
+
 ## 既存資産
 
 - 株エンジン: `C:\devlop\StockPricePpredictionTool\backend\app\backtest\engine.py`

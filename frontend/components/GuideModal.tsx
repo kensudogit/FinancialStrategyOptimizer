@@ -100,7 +100,7 @@ export function GuideButton() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button type="button" className="guide-trigger" onClick={() => setOpen(true)}>
+      <button type="button" className="pill" onClick={() => setOpen(true)}>
         利用手順
       </button>
       {open && <GuideModal onClose={() => setOpen(false)} />}

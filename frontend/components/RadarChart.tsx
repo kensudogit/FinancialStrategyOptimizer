@@ -14,7 +14,7 @@ export function RadarChart({
   const cx = 140;
   const cy = 140;
   const r = 92;
-  const colors = ["#6c5ce7", "#00b894", "#fd79a8", "#0984e3"];
+  const colors = ["#3dd68c", "#e8b84a", "#8aa396", "#e85d5d"];
 
   function point(index: number, value: number) {
     const angle = -Math.PI / 2 + (index * 2 * Math.PI) / n;
@@ -28,7 +28,7 @@ export function RadarChart({
         <polygon
           key={scale}
           fill="none"
-          stroke="#e2dcfb"
+          stroke="#2a3a32"
           points={axes
             .map((_, i) => point(i, scale * 100).join(","))
             .join(" ")}
@@ -39,8 +39,8 @@ export function RadarChart({
         const [lx, ly] = point(i, 118);
         return (
           <g key={axis}>
-            <line x1={cx} y1={cy} x2={x} y2={y} stroke="#d8d2f5" />
-            <text x={lx} y={ly} textAnchor="middle" fontSize="10" fill="#4b5563">
+            <line x1={cx} y1={cy} x2={x} y2={y} stroke="#2a3a32" />
+            <text x={lx} y={ly} textAnchor="middle" fontSize="10" fill="#8aa396">
               {axis}
             </text>
           </g>

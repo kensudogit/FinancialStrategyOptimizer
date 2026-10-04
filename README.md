@@ -26,6 +26,7 @@ Backtest Engine ──────────┘
 | Backtest Engine | pandas 単一エンジンに KPI を揃える（`backend/app/services/backtest.py`） |
 
 作業対応は [`docs/作業内容.md`](docs/作業内容.md) です。
+エージェント規約は [`skill/financial-strategy-optimizer/SKILL.md`](skill/financial-strategy-optimizer/SKILL.md) です。
 
 ## 技術構成
 

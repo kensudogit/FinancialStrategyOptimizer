@@ -83,93 +83,102 @@ export default function Page() {
 
   return (
     <main>
-      <div className="app-bar">
-        <span className="app-bar-accent" />
-        <div className="app-bar-text">
-          <p className="app-eyebrow">FINANCIAL STRATEGY</p>
-          <h1>Financial Strategy Optimizer</h1>
+      <header className="hero">
+        <div>
+          <p className="brand">FSO</p>
+          <h1>分析・予測・売買・バックテストを一つの画面で。</h1>
           <p className="lead">
-            株価・FX と売買戦略を入力し、バックテストから KPI、パラメータ探索、複数戦略比較、レーダー、レポートまで一気通貫します。
-            StockPricePredictionTool と fx は残したまま、この層で束ねます。
+            バックテスト / KPI / パラメータ探索 / 複数戦略比較 / レーダー / レポート
           </p>
         </div>
-        <GuideButton />
-      </div>
+        <div className="status">
+          <GuideButton />
+          <span className="pill">
+            <span className={error && !catalog ? "dotBad" : "dotOk"} />
+            API {catalog ? "ok" : error ? "down" : "…"}
+          </span>
+          <span className="pill">mode: paper</span>
+          <span className="pill">live: paper</span>
+        </div>
+      </header>
 
-      <section>
-        <h2>入力</h2>
-        <div className="controls">
-          <label>
-            資産
-            <select
-              value={assetClass}
-              onChange={(e) => setAssetClass(e.target.value as AssetClass)}
-            >
-              <option value="stock">株</option>
-              <option value="fx">FX</option>
-            </select>
-          </label>
-          <label>
-            銘柄
-            <select value={symbol} onChange={(e) => setSymbol(e.target.value)}>
-              {symbols.map((item) => (
-                <option key={item.symbol} value={item.symbol}>
-                  {item.symbol} {item.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            seed
-            <input type="number" value={seed} onChange={(e) => setSeed(Number(e.target.value) || 1)} />
-          </label>
-          <label>
-            試行数
-            <input type="number" value={maxTrials} onChange={(e) => setMaxTrials(Number(e.target.value) || 8)} />
-          </label>
-          <label>
-            手数料bps
-            <input type="number" value={feeBps} onChange={(e) => setFeeBps(Number(e.target.value) || 0)} />
-          </label>
-        </div>
-        <div className="strategy-list">
-          {(catalog?.strategies ?? []).map((s) => (
-            <label key={s.id} className="chip">
-              <input type="checkbox" checked={strategies.includes(s.id)} onChange={() => toggle(s.id)} />
-              {s.label}
-              <span>{s.origin}</span>
-            </label>
-          ))}
-        </div>
+      <section className="toolbar">
+        <label className="field">
+          資産
+          <select
+            value={assetClass}
+            onChange={(e) => setAssetClass(e.target.value as AssetClass)}
+          >
+            <option value="stock">株</option>
+            <option value="fx">FX</option>
+          </select>
+        </label>
+        <label className="field">
+          銘柄
+          <select value={symbol} onChange={(e) => setSymbol(e.target.value)}>
+            {symbols.map((item) => (
+              <option key={item.symbol} value={item.symbol}>
+                {item.symbol} {item.name ? `— ${item.name}` : ""}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="field">
+          seed
+          <input type="number" value={seed} onChange={(e) => setSeed(Number(e.target.value) || 1)} />
+        </label>
+        <label className="field">
+          試行数
+          <input type="number" value={maxTrials} onChange={(e) => setMaxTrials(Number(e.target.value) || 8)} />
+        </label>
+        <label className="field">
+          手数料bps
+          <input type="number" value={feeBps} onChange={(e) => setFeeBps(Number(e.target.value) || 0)} />
+        </label>
         <button type="button" className="primary" onClick={run} disabled={busy || strategies.length === 0}>
           {busy ? "実行中…" : "一気通貫"}
         </button>
-        {error && <p className="error">{error}</p>}
       </section>
-
-      {catalog && (
-        <section>
-          <h2>統合している既存資産</h2>
-          <ul className="integrations">
-            {catalog.integrations.map((item) => (
-              <li key={item.id}>
-                <strong>{item.name}</strong>
-                <span>{item.available ? "検出" : "パス未検出（ローカル実装で代替）"}</span>
-                <em>{item.role}</em>
-              </li>
-            ))}
-          </ul>
-        </section>
+      <div className="strategy-list">
+        {(catalog?.strategies ?? []).map((s) => (
+          <label key={s.id} className="chip">
+            <input type="checkbox" checked={strategies.includes(s.id)} onChange={() => toggle(s.id)} />
+            {s.label}
+            <span>{s.origin}</span>
+          </label>
+        ))}
+      </div>
+      {error && <p className="error">{error}</p>}
+      {result && top && (
+        <p className="note">
+          {result.symbol} / {result.source} / {result.bars}本。先頭は目的関数順です。
+          {top.optimized ? " パラメータ探索済み。" : ""} {top.note}
+        </p>
       )}
 
+      <section className="chart-grid">
+        <article className="panel panel-half">
+          <h3>資産曲線 — 戦略 / バイ＆ホールド</h3>
+          {topBacktest ? (
+            <EquityChart points={topBacktest.equity_curve} />
+          ) : (
+            <p className="empty">「一気通貫」でバックテスト曲線を表示</p>
+          )}
+        </article>
+        <article className="panel panel-half">
+          <h3>レーダー — 複数戦略比較</h3>
+          {result ? (
+            <RadarChart series={result.comparison.radar_series} />
+          ) : (
+            <p className="empty">実行後に戦略レーダーを表示</p>
+          )}
+        </article>
+      </section>
+
       {result && top && (
-        <>
-          <section>
+        <section className="grid">
+          <article className="panel panel-wide">
             <h2>結果 — {result.symbol}</h2>
-            <p className="note">
-              {result.source} / {result.bars}本。先頭は目的関数順です。
-              {top.optimized ? " パラメータ探索済み。" : ""} {top.note}
-            </p>
             <div className="kpi-grid">
               <Kpi label="Sharpe" value={top.kpi.sharpe.toFixed(2)} />
               <Kpi label="リターン" value={`${(top.kpi.total_return * 100).toFixed(1)}%`} />
@@ -181,48 +190,59 @@ export default function Page() {
                 value={top.walk_forward?.summary?.robustness_label ?? "—"}
               />
             </div>
-            {topBacktest && <EquityChart points={topBacktest.equity_curve} />}
-          </section>
-
-          <section>
+          </article>
+          <article className="panel panel-wide">
             <h2>複数戦略比較</h2>
-            <div className="compare-wrap">
-              <RadarChart series={result.comparison.radar_series} />
-              <table>
-                <thead>
-                  <tr>
-                    <th>戦略</th>
-                    <th>Sharpe</th>
-                    <th>リターン</th>
-                    <th>DD</th>
-                    <th>勝率</th>
-                    <th>目的関数</th>
+            <table>
+              <thead>
+                <tr>
+                  <th>戦略</th>
+                  <th>Sharpe</th>
+                  <th>リターン</th>
+                  <th>DD</th>
+                  <th>勝率</th>
+                  <th>目的関数</th>
+                </tr>
+              </thead>
+              <tbody>
+                {result.comparison.ranking.map((row) => (
+                  <tr key={row.strategy}>
+                    <td>{row.strategy}</td>
+                    <td>{row.kpi.sharpe.toFixed(2)}</td>
+                    <td>{(row.kpi.total_return * 100).toFixed(1)}%</td>
+                    <td>{(row.kpi.max_drawdown * 100).toFixed(1)}%</td>
+                    <td>{(row.kpi.win_rate * 100).toFixed(1)}%</td>
+                    <td>{row.kpi.objective.toFixed(2)}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {result.comparison.ranking.map((row) => (
-                    <tr key={row.strategy}>
-                      <td>{row.strategy}</td>
-                      <td>{row.kpi.sharpe.toFixed(2)}</td>
-                      <td>{(row.kpi.total_return * 100).toFixed(1)}%</td>
-                      <td>{(row.kpi.max_drawdown * 100).toFixed(1)}%</td>
-                      <td>{(row.kpi.win_rate * 100).toFixed(1)}%</td>
-                      <td>{row.kpi.objective.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section>
+                ))}
+              </tbody>
+            </table>
+          </article>
+          <article className="panel panel-wide">
             <h2>レポート</h2>
-            <button type="button" onClick={downloadReport}>
+            <button type="button" className="ghost" onClick={downloadReport}>
               Markdown を保存
             </button>
             <pre className="report">{result.report_markdown}</pre>
-          </section>
-        </>
+          </article>
+        </section>
+      )}
+
+      {catalog && (
+        <section className="grid">
+          <article className="panel panel-wide">
+            <h2>統合している既存資産</h2>
+            <ul className="integrations">
+              {catalog.integrations.map((item) => (
+                <li key={item.id}>
+                  <strong>{item.name}</strong>
+                  <span>{item.available ? "検出" : "パス未検出（ローカル実装で代替）"}</span>
+                  <em>{item.role}</em>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </section>
       )}
     </main>
   );

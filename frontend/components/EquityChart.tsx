@@ -6,8 +6,8 @@ export function EquityChart({
   points: { ts: string; equity: number; buy_hold: number }[];
 }) {
   if (points.length < 2) return null;
-  const w = 520;
-  const h = 180;
+  const w = 560;
+  const h = 280;
   const pad = 28;
   const ys = points.flatMap((p) => [p.equity, p.buy_hold]);
   const min = Math.min(...ys);
@@ -18,12 +18,12 @@ export function EquityChart({
 
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className="equity" role="img" aria-label="資産曲線">
-      <path d={line("buy_hold")} fill="none" stroke="#b2bec3" strokeWidth="1.6" />
-      <path d={line("equity")} fill="none" stroke="#6c5ce7" strokeWidth="2" />
-      <text x={pad} y={16} fontSize="11" fill="#6c5ce7">
+      <path d={line("buy_hold")} fill="none" stroke="#8aa396" strokeWidth="1.6" strokeDasharray="4 3" />
+      <path d={line("equity")} fill="none" stroke="#3dd68c" strokeWidth="2" />
+      <text x={pad} y={16} fontSize="11" fill="#3dd68c">
         戦略
       </text>
-      <text x={70} y={16} fontSize="11" fill="#636e72">
+      <text x={70} y={16} fontSize="11" fill="#8aa396">
         バイ＆ホールド
       </text>
     </svg>
