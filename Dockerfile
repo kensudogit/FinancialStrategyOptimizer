@@ -11,6 +11,7 @@ RUN mkdir -p public
 ENV NEXT_PUBLIC_API_URL=/api
 ENV API_INTERNAL_URL=http://127.0.0.1:8000
 ENV NEXT_TELEMETRY_DISABLED=1
+RUN mkdir -p public/test-results && npm test
 RUN npm run build
 
 FROM python:3.12-slim
@@ -25,15 +26,29 @@ RUN apt-get update \
 COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 COPY backend/app /app/backend/app
+COPY backend/tests /app/backend/tests
+COPY backend/pytest.ini /app/backend/pytest.ini
 
-COPY --from=frontend-build /frontend/public /app/frontend/public
 COPY --from=frontend-build /frontend/.next/standalone /app/frontend
 COPY --from=frontend-build /frontend/.next/static /app/frontend/.next/static
+COPY --from=frontend-build /frontend/public /app/frontend/public
+
+ENV PYTHONPATH=/app/backend
+ENV FSO_TEST_RESULTS=/app/test-results
+ENV FRONTEND_ROOT=/app/frontend
+RUN mkdir -p /app/test-results \
+  && if [ -f /app/frontend/public/test-results/frontend-junit.xml ]; then \
+       cp /app/frontend/public/test-results/frontend-junit.xml /app/test-results/frontend-junit.xml; \
+     fi \
+  && python -c "from app.services.test_runner import run_all; run_all()"
 
 COPY start.sh /app/start.sh
 RUN sed -i 's/\r$//' /app/start.sh && chmod +x /app/start.sh
 
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app/backend
+ENV FSO_TEST_RESULTS=/app/test-results
+ENV FRONTEND_ROOT=/app/frontend
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_PUBLIC_API_URL=/api
 ENV API_INTERNAL_URL=http://127.0.0.1:8000

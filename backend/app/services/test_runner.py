@@ -87,9 +87,37 @@ def _parse_junit(path: Path, suite_name: str) -> dict[str, Any]:
     }
 
 
+def _empty(suite: str, message: str, exit_code: int = 0) -> dict[str, Any]:
+    return {
+        "suite": suite,
+        "exit_code": exit_code,
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 0,
+        "suites": [],
+        "message": message,
+    }
+
+
+def _existing_junit(*candidates: Path | None) -> Path | None:
+    for path in candidates:
+        if path and path.exists() and path.is_file():
+            return path
+    return None
+
+
 def _run_pytest() -> dict[str, Any]:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     junit = RESULTS_DIR / "backend-junit.xml"
+    tests_dir = BACKEND_ROOT / "tests"
+    if not tests_dir.is_dir():
+        baked = _existing_junit(junit)
+        if baked:
+            out = _parse_junit(baked, "backend")
+            out["message"] = "ビルド時の pytest JUnit です"
+            return out
+        return _empty("backend", "backend/tests がイメージにありません")
     env = os.environ.copy()
     env["PYTHONPATH"] = str(BACKEND_ROOT)
     env["FSO_FORCE_SAMPLE"] = "1"
@@ -102,6 +130,8 @@ def _run_pytest() -> dict[str, Any]:
     out = _parse_junit(junit, "backend")
     out["exit_code"] = code
     out["html_report"] = None
+    if out["total"] == 0 and code != 0:
+        out["message"] = "pytest が JUnit を書けませんでした"
     return out
 
 
@@ -118,54 +148,40 @@ def _frontend_root() -> Path | None:
     return None
 
 
+def _vitest_available(root: Path) -> bool:
+    return (root / "node_modules" / "vitest").exists() or (root / "node_modules" / ".bin" / "vitest").exists()
+
+
 def _run_vitest() -> dict[str, Any]:
     root = _frontend_root()
-    if root is None:
-        return {
-            "suite": "frontend",
-            "exit_code": 0,
-            "total": 0,
-            "passed": 0,
-            "failed": 0,
-            "skipped": 0,
-            "suites": [],
-            "message": "frontend ディレクトリが見つかりません",
-        }
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     junit = RESULTS_DIR / "frontend-junit.xml"
-    npm = shutil.which("npm")
-    code = 0
     ran = False
-    if npm:
+    code = 0
+    if root is not None and shutil.which("npm") and _vitest_available(root):
         code = subprocess.run(
-            [npm, "test", "--", "--run", "--reporter=junit", f"--outputFile={junit}"],
+            [shutil.which("npm"), "test", "--", "--run", "--reporter=junit", f"--outputFile={junit}"],
             cwd=str(root),
             check=False,
         ).returncode
         ran = True
-    if not junit.exists():
-        for candidate in (
-            root / "public" / "test-results" / "frontend-junit.xml",
-            root / "test-results" / "frontend-junit.xml",
-        ):
-            if candidate.exists():
-                junit = candidate
-                break
-    if not junit.exists():
-        return {
-            "suite": "frontend",
-            "exit_code": 0 if not ran else code,
-            "total": 0,
-            "passed": 0,
-            "failed": 0 if not ran or code == 0 else 1,
-            "skipped": 0,
-            "suites": [],
-            "message": "npm が無い、または Vitest JUnit がありません。frontend で npm test を実行してください。",
-        }
-    out = _parse_junit(junit, "frontend")
-    out["exit_code"] = code if ran else out.get("exit_code", 0)
-    if not ran:
-        out["message"] = "前回の Vitest JUnit を表示しています"
+    baked = _existing_junit(
+        junit,
+        (root / "public" / "test-results" / "frontend-junit.xml") if root else None,
+        (root / "test-results" / "frontend-junit.xml") if root else None,
+        Path("/app/frontend/public/test-results/frontend-junit.xml"),
+    )
+    if baked is None:
+        if root is None:
+            return _empty("frontend", "frontend ディレクトリが見つかりません")
+        if ran:
+            return _empty("frontend", "Vitest JUnit が書けませんでした", exit_code=code)
+        return _empty("frontend", "本番イメージに Vitest が無いため、ビルド時 JUnit を使います")
+    out = _parse_junit(baked, "frontend")
+    if ran:
+        out["exit_code"] = code
+    else:
+        out["message"] = "ビルド時の Vitest JUnit です"
     return out
 
 
@@ -179,7 +195,7 @@ def run_all() -> dict[str, Any]:
     skipped = int(backend.get("skipped", 0)) + int(frontend.get("skipped", 0))
     summary = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "status": "ok" if failed == 0 else "failed",
+        "status": "ok" if failed == 0 and total > 0 else ("failed" if failed else "missing"),
         "backend": backend,
         "frontend": frontend,
         "totals": {
@@ -187,7 +203,7 @@ def run_all() -> dict[str, Any]:
             "passed": passed,
             "failed": failed,
             "skipped": skipped,
-            "ok": failed == 0,
+            "ok": failed == 0 and total > 0,
         },
     }
     _summary_path().write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -58,6 +58,7 @@ PowerShell なら `.\start.ps1` です（`COMPOSE_BAKE=false`）。
 2. ビルダは Dockerfile（`railway.toml` で指定済み）
 3. 公開 URL が画面。API は同じオリジンの `/api`
 4. Postgres を付ける場合は `DATABASE_URL` をサービスに接続する。無くても探索は動く
+5. `/tests` はイメージビルド時に pytest と Vitest を走らせ、結果を焼き込む。本番に npm / Vitest は載せない
 
 ## 起動（ローカル）
 

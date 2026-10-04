@@ -116,8 +116,18 @@ export default function TestsPage() {
         setError(typeof data.detail === "string" ? data.detail : "実行に失敗しました");
         return;
       }
-      if (data.summary) setSummary(data.summary);
-      else await load();
+      if (data.summary) {
+        const next = data.summary;
+        if (!(next.frontend?.total)) {
+          const fx = await fetch("/test-results/frontend-junit.xml", { cache: "no-store" });
+          if (fx.ok) {
+            next.frontend = parseJunitXml(await fx.text());
+            setSummary(withTotals(next));
+            return;
+          }
+        }
+        setSummary(next.totals ? next : withTotals(next));
+      } else await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "実行に失敗しました");
     } finally {
