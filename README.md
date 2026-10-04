@@ -88,3 +88,4 @@ cd C:\devlop\FinancialStrategyOptimize\backend
 - 証明していない解を最適と呼ばない
 - サンプル OHLCV は決定的な疑似系列。実データは既存 StockAI / fx から差し替える
 - 乱数を使う探索は `seed` で再現する
+# FinancialStrategyOptimize
