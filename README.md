@@ -48,6 +48,16 @@ PowerShell なら `.\start.ps1` です（`COMPOSE_BAKE=false`）。
 
 停止は `docker compose down` です。
 
+## Railway
+
+リポジトリ直下は backend と frontend が並んでいるため、Railpack は言語を判定できません。
+ルートの `railway.toml` と `Dockerfile` で、API と画面を1サービスにまとめています。
+
+1. GitHub リポジトリから Deploy する
+2. ビルダは Dockerfile（`railway.toml` で指定済み）
+3. 公開 URL が画面。API は同じオリジンの `/api`
+4. Postgres を付ける場合は `DATABASE_URL` をサービスに接続する。無くても探索は動く
+
 ## 起動（ローカル）
 
 ```powershell

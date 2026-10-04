@@ -19,3 +19,4 @@
 ## 起動
 
 `start.cmd` または `.\start.ps1`（`COMPOSE_BAKE=false`）。ポートは 8020 / 3020 / 5434。
+Railway はルートの `Dockerfile`（`railway.toml`）。Railpack 単体では判定できない。
