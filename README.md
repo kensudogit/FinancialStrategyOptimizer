@@ -89,3 +89,4 @@ cd C:\devlop\FinancialStrategyOptimize\backend
 - サンプル OHLCV は決定的な疑似系列。実データは既存 StockAI / fx から差し替える
 - 乱数を使う探索は `seed` で再現する
 # FinancialStrategyOptimize
+# FinancialStrategyOptimize
