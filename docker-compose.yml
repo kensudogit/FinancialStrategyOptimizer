@@ -25,8 +25,14 @@ services:
       FX_ROOT: /opt/fx
       STOCKAI_URL: ${STOCKAI_URL:-http://host.docker.internal:8000}
       FSO_ALLOW_LIVE_DATA: ${FSO_ALLOW_LIVE_DATA:-1}
+      ALLOW_TEST_RUN: ${ALLOW_TEST_RUN:-true}
+      FRONTEND_ROOT: /opt/frontend
+      FSO_TEST_RESULTS: /app/test-results
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - ./test-results:/app/test-results
+      - ./frontend:/opt/frontend
     depends_on:
       postgres:
         condition: service_healthy

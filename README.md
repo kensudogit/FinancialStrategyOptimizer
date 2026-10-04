@@ -81,6 +81,7 @@ npm run dev -- --port 3020
 ## API
 
 - `GET /health` / `GET /catalog` / `GET /sample`
+- `GET /tests/summary` / `GET /tests/report` / `POST /tests/run` — pytest / Vitest 結果
 - `POST /backtest` — 単一戦略
 - `POST /optimize` — パラメータ探索。格子を走査し切ったときだけ「探索空間内の最良」
 - `POST /compare` — 複数戦略 + レーダー
@@ -90,14 +91,16 @@ npm run dev -- --port 3020
 ## テスト
 
 ```powershell
-cd C:\devlop\FinancialStrategyOptimize\backend
+cd C:\devlop\FinancialStrategyOptimizer\backend
 .\.venv\Scripts\python.exe -m pytest -q
+cd ..\frontend
+npm test
 ```
+
+画面の「テスト結果」（http://localhost:3020/tests）から全テスト実行とケース一覧を確認できます。
 
 ## 制約
 
 - 証明していない解を最適と呼ばない
 - サンプル OHLCV は決定的な疑似系列。実データは既存 StockAI / fx から差し替える
 - 乱数を使う探索は `seed` で再現する
-# FinancialStrategyOptimize
-# FinancialStrategyOptimize

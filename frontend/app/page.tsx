@@ -94,6 +94,9 @@ export default function Page() {
           </p>
         </div>
         <div className="status">
+          <a className="pill" href="/tests">
+            テスト結果
+          </a>
           <GuideButton />
           <span className="pill">
             <span className={error && !catalog ? "dotBad" : "dotOk"} />

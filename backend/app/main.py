@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
 
 from app.db import SessionLocal, StrategyRun, init_db
 from app.models import (
@@ -23,6 +24,7 @@ from app.services.optimizer import search_params
 from app.services.pipeline import run_pipeline
 from app.services.report import render_report
 from app.services.strategies import catalog as strategy_catalog
+from app.services.test_runner import RESULTS_DIR, load_summary, run_all
 
 app = FastAPI(
     title="Financial Strategy Optimizer",
@@ -57,6 +59,35 @@ def _startup() -> None:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/tests/summary")
+def tests_summary() -> dict:
+    return load_summary()
+
+
+@app.get("/tests/report", response_class=HTMLResponse)
+def tests_report() -> str:
+    index = RESULTS_DIR / "index.html"
+    if index.exists():
+        return index.read_text(encoding="utf-8")
+    return "<h1>No test report</h1><p>POST /tests/run を先に実行してください。</p>"
+
+
+@app.get("/tests/files/{name}")
+def tests_file(name: str):
+    safe = Path(name).name
+    path = RESULTS_DIR / safe
+    if not path.exists() or not path.is_file():
+        raise HTTPException(404, f"{safe} not found")
+    return FileResponse(path)
+
+
+@app.post("/tests/run")
+def tests_run() -> dict:
+    if os.getenv("ALLOW_TEST_RUN", "true").lower() in {"0", "false", "no"}:
+        raise HTTPException(403, "Test runs disabled")
+    return {"status": "completed", "summary": run_all()}
 
 
 @app.get("/catalog")

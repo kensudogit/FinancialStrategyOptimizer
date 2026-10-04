@@ -78,6 +78,12 @@ const ADVANCED_STEPS: Step[] = [
     body: "画面下の一覧は StockPricePredictionTool、fx、Heuristic Optimizer、Backtest Engine です。「検出」はパスが見つかったとき、「パス未検出（ローカル実装で代替）」はアダプタがローカル実装に落ちたときです。役割の説明も同じ行に出ます。",
     note: "StockAI と fx は置き換えません。実 OHLCV や既存バックテストへ進めるときはアダプタ経由です。作業の対応表は docs/作業内容.md、起動と制約は README.md と skill/financial-strategy-optimizer/SKILL.md です。",
   },
+  {
+    no: "10",
+    title: "テスト結果を画面で確認する",
+    body: "ヘッダーの「テスト結果」または http://localhost:3020/tests を開きます。Python は pytest の Test* クラス、画面は Vitest です。「全テスト実行」で両方を走らせ、ケース一覧と HTML レポートを確認できます。",
+    note: "探索ロジックはテスト実行ルートにも埋めません。結果は GET /tests/summary と GET /tests/report です。",
+  },
 ];
 
 const TIPS: { title: string; body: string }[] = [
@@ -170,7 +176,7 @@ export function GuideModal({ onClose }: { onClose: () => void }) {
             </p>
             <ul className="guide-list">
               <li>Next.js — 銘柄・戦略・seed、一気通貫、資産曲線、レーダー、KPI、レポート保存</li>
-              <li>FastAPI — /health /catalog /sample /backtest /optimize /compare /pipeline /report</li>
+              <li>FastAPI — /health /catalog /sample /backtest /optimize /compare /pipeline /report /tests</li>
               <li>pandas 単一エンジン — KPI スキーマを戦略間で揃える。曲線は探索後パラメータ</li>
               <li>grid / random / sa — seed・試行数・制限時間。未証明を最適と呼ばない</li>
               <li>Yahoo / StockAI HTTP / Stooq — 取れた日足を使う。失敗時だけサンプル</li>

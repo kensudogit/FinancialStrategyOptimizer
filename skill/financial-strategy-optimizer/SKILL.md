@@ -77,8 +77,8 @@ PowerShell は `.\start.ps1`（`COMPOSE_BAKE=false`）。
 | `optimizer.py` | パラメータ探索 |
 | `compare.py` / `pipeline.py` / `report.py` | 比較・一気通貫・Markdown/HTML |
 
-- `GET /health` `/catalog` `/sample`
-- `POST /backtest` `/optimize` `/compare` `/pipeline` `/report`
+- `GET /health` `/catalog` `/sample` `/tests/summary` `/tests/report`
+- `POST /backtest` `/optimize` `/compare` `/pipeline` `/report` `/tests/run`
 
 ## 実装原則
 
