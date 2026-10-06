@@ -161,3 +161,31 @@ npm test
 - 証明していない解を最適と呼ばない
 - サンプル OHLCV は決定的な疑似系列。実データは既存 StockAI / fx から差し替える
 - 乱数を使う探索は `seed` で再現する
+
+---
+
+## Portfolio Evidence & Evaluation
+
+The portfolio value of this project is **reproducible strategy comparison**, not a claim of guaranteed investment performance.
+
+| Evaluation area | What to inspect |
+|---|---|
+| Reproducibility | Fixed input data, explicit parameter space and random seed |
+| Strategy quality | Return-oriented KPI together with risk/drawdown metrics |
+| Generalization | Separate in-sample optimization from out-of-sample / walk-forward evidence when real market data is used |
+| Search integrity | Report whether the search space was exhausted; do not label an unproven candidate a mathematical optimum |
+| Comparability | Evaluate strategies through the same backtest/KPI pipeline |
+| Auditability | Persist parameters, results and report artifacts so a run can be reconstructed |
+
+### Reviewer demo path
+
+1. Open the sample/catalog data to establish the input and strategy definition.
+2. Run a single backtest and inspect KPI/risk output.
+3. Run parameter optimization with an explicit search space and seed.
+4. Compare multiple candidates in the radar/KPI view.
+5. Generate the HTML report and verify that inputs, metrics and selected candidate remain traceable.
+6. Inspect the test-results view to separate software-test evidence from financial-performance evidence.
+
+### Maturity boundary
+
+Sample OHLCV data is deterministic and intended for engineering demonstration. Before any real investment use, market-data quality, transaction costs, slippage, liquidity, survivorship/look-ahead bias, out-of-sample validation and risk controls must be validated independently. This project is software/quant engineering evidence and does not provide investment advice or guaranteed returns.
