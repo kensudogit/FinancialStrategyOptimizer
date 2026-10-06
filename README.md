@@ -1,32 +1,88 @@
 # Financial Strategy Optimizer
 
-株価・FX データと売買戦略を入力し、
+> **FinTech / Quant Strategy Optimization Platform** — 株式・FX・バックテスト・ヒューリスティック探索を統合し、再現可能な戦略評価とパラメータ最適化を行うフルスタック基盤です。
+>
+> **Stack:** Python 3.12 · FastAPI · Next.js 15 · React 19 · TypeScript · PostgreSQL 16 · Docker · Railway
 
-**バックテスト → KPI → パラメータ探索 → 最適化 → 複数戦略比較 → レーダーチャート → レポート**
+## Portfolio Overview
 
-まで一気通貫する統合パッケージです。
-
-既存資産は捨てません。
-
-```
-StockPricePredictionTool ─┐
-                          ├→ FinancialStrategyOptimizer
-fx ───────────────────────┤
-                          │
-Heuristic Optimizer ──────┤
-                          │
-Backtest Engine ──────────┘
-```
-
-| 既存 | このパッケージでの役割 |
+| Item | Description |
 |---|---|
-| `C:\devlop\StockPricePpredictionTool` | 株 OHLCV、SMAクロス、Sharpe/DD KPI |
-| `C:\devlop\fx` | FX OHLCV、RSI/MACD、ウォークフォワード堅牢性 |
-| `C:\devlop\heuristic-optimizer` | seed・制限時間・複数提案・未証明を最適と呼ばない作法 |
-| Backtest Engine | pandas 単一エンジンに KPI を揃える（`backend/app/services/backtest.py`） |
+| **Problem** | 株式・FX・バックテスト・最適化が個別ツールに分散すると、KPI・探索条件・再現性が揃わず、戦略比較が難しい |
+| **Solution** | データと戦略を共通パイプラインへ投入し、Backtest → KPI → Search → Optimization → Comparison → Report を一気通貫で実行 |
+| **Architecture** | Next.js UI → FastAPI → Strategy / Backtest / Optimization Services → PostgreSQL → Report |
+| **Differentiators** | 株式とFXの横断、共通KPI、複数戦略比較、seedによる再現性、「未証明の解を最適と呼ばない」探索設計 |
+| **Role** | FinTechポートフォリオにおける **Quant Strategy Integration Layer** |
 
-作業対応は [`docs/作業内容.md`](docs/作業内容.md) です。
-エージェント規約は [`skill/financial-strategy-optimizer/SKILL.md`](skill/financial-strategy-optimizer/SKILL.md) です。
+## Architecture
+
+```text
+Stock / FX Data
+      │
+      ▼
+ Strategy Definitions
+      │
+      ▼
+┌───────────────────────────────┐
+│ FinancialStrategyOptimizer    │
+│                               │
+│ Backtest Engine               │
+│ KPI / Risk Metrics            │
+│ Parameter Search              │
+│ Heuristic Optimization        │
+│ Strategy Comparison           │
+│ Report Generation             │
+└───────────────┬───────────────┘
+                │
+        ┌───────┴────────┐
+        ▼                ▼
+   PostgreSQL       Next.js UI
+                         │
+                         ▼
+              Radar / KPI / Report
+```
+
+## FinTech Portfolio Map
+
+This repository is the integration and optimization layer of the broader FinTech/Quant portfolio.
+
+| Repository | Primary role | Relationship |
+|---|---|---|
+| [Fintech](../Fintech) | Enterprise Financial AI | Valuation, lending, B2B matching, financial RAG and evidence-led decision support |
+| [fx](../fx) | FX / Quant | FX market analysis, indicators, ML, risk management and backtesting |
+| [StockPricePpredictionTool-](../StockPricePpredictionTool-) | Equity AI Agent | Equity analysis, prediction, walk-forward evidence, risk gates and trading workflow |
+| [heuristic-optimizer](../heuristic-optimizer) | Optimization Engine | Reproducible heuristic search and constrained solution exploration |
+| **FinancialStrategyOptimizer** | **Quant Strategy Integration** | Unifies backtesting, KPI, parameter search, optimization, comparison and reporting |
+
+## Engineering Differentiators
+
+- **Common evaluation pipeline** — strategies are compared through the same backtest and KPI model instead of unrelated tool-specific metrics.
+- **Reproducible optimization** — stochastic exploration uses explicit seeds and bounded search conditions.
+- **Evidence-aware terminology** — an unproven candidate is not presented as a mathematically proven optimum.
+- **Cross-asset design** — equity and FX strategy inputs can be evaluated through the same integration layer.
+- **Separation of concerns** — optimization and backtesting live in backend services rather than API route handlers.
+- **Operational portability** — Docker/Railway deployment plus PostgreSQL-optional local execution.
+- **Test visibility** — backend/frontend test results can be inspected from the application UI.
+
+## Optimization Pipeline
+
+```text
+Market Data
+   ↓
+Strategy + Parameter Space
+   ↓
+Backtest
+   ↓
+KPI / Risk Evaluation
+   ↓
+Parameter Search / Heuristic Search
+   ↓
+Candidate Strategies
+   ↓
+Comparison + Radar Visualization
+   ↓
+HTML Report
+```
 
 ## 技術構成
 
