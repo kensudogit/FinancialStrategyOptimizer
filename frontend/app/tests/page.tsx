@@ -67,6 +67,27 @@ function parseJunitXml(xml: string): SideSummary {
   };
 }
 
+function apiDownMessage(status: number, body: string): string {
+  const looksProxyFail =
+    status >= 500 || /^\s*</.test(body) || body.startsWith("Internal Server") || body.includes("ECONNREFUSED");
+  if (looksProxyFail) {
+    return "API（8020）に接続できません。リポジトリ直下で start.cmd を実行してください。";
+  }
+  return body.trim() || `読込に失敗しました（${status}）`;
+}
+
+async function readJson<T>(res: Response): Promise<T> {
+  const text = await res.text();
+  if (!res.ok) {
+    throw new Error(apiDownMessage(res.status, text));
+  }
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new Error(apiDownMessage(res.status || 502, text));
+  }
+}
+
 function withTotals(summary: Summary): Summary {
   const backend = summary.backend ?? {};
   const frontend = summary.frontend ?? {};
@@ -89,7 +110,7 @@ export default function TestsPage() {
     setError("");
     try {
       const res = await fetch("/api/tests/summary", { cache: "no-store" });
-      const data = (await res.json()) as Summary;
+      const data = await readJson<Summary>(res);
       if (!(data.frontend?.total)) {
         const fx = await fetch("/test-results/frontend-junit.xml", { cache: "no-store" });
         if (fx.ok) {
@@ -111,11 +132,7 @@ export default function TestsPage() {
     setError("");
     try {
       const res = await fetch("/api/tests/run", { method: "POST" });
-      const data = (await res.json()) as { summary?: Summary; detail?: string };
-      if (!res.ok) {
-        setError(typeof data.detail === "string" ? data.detail : "実行に失敗しました");
-        return;
-      }
+      const data = await readJson<{ summary?: Summary; detail?: string }>(res);
       if (data.summary) {
         const next = data.summary;
         if (!(next.frontend?.total)) {
@@ -149,7 +166,10 @@ export default function TestsPage() {
     <main>
       <header className="hero">
         <div>
-          <p className="brand">FSO</p>
+          <p className="brand">
+            <img src="/PC.png" alt="" className="logo" width={28} height={28} />
+            FSO
+          </p>
           <h1>テスト結果</h1>
           <p className="lead">Python (pytest) / TypeScript (Vitest) のクラスとケースを確認できます。</p>
         </div>

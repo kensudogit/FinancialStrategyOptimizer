@@ -10,4 +10,11 @@ describe("RootLayout", () => {
   it("タイトルを公開する", () => {
     expect(metadata.title).toContain("Financial Strategy Optimizer");
   });
+
+  it("タブアイコンに PC.png を使う", () => {
+    expect(metadata.icons).toEqual({
+      icon: "/PC.png",
+      apple: "/PC.png",
+    });
+  });
 });

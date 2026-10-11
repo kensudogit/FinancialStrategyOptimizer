@@ -87,7 +87,10 @@ export default function Page() {
     <main>
       <header className="hero">
         <div>
-          <p className="brand">FSO</p>
+          <p className="brand">
+            <img src="/PC.png" alt="" className="logo" width={28} height={28} />
+            FSO
+          </p>
           <h1>分析・予測・売買・バックテストを一つの画面で。</h1>
           <p className="lead">
             バックテスト / KPI / パラメータ探索 / 複数戦略比較 / レーダー / レポート

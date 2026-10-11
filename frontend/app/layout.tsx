@@ -4,6 +4,10 @@ import "./globals.css";
 export const metadata = {
   title: "Financial Strategy Optimizer",
   description: "株・FX戦略のバックテストから最適化・比較・レポートまで",
+  icons: {
+    icon: "/PC.png",
+    apple: "/PC.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
